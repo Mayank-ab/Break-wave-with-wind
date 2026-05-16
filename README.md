@@ -40,7 +40,10 @@ chmod +x runCase
 ./runCase
 ```
 For a clean run, remove old time folders and processor folders before restarting.
-
+```bash
+chmod +x cleanCase
+./cleanCase
+```
 
 ### From here on these are already provided in the case I am just going through them one by one
 
