@@ -1,0 +1,24 @@
+#!/bin/bash
+shopt -s extglob
+
+directory=`pwd`
+
+read -p "Clearing case. Are you sure? (y/N) " -n 1 -r
+echo ' '
+if ! [[ $REPLY =~ ^[Yy]$ ]]
+then
+    exit
+fi
+rm -rf processor*
+
+if [ -d "./constant/polyMesh" ]; then
+  cd ./constant
+  rm -rf constant/polyMesh
+
+  cd $directory
+fi
+
+rm -fr *[0-9].[0-9]* [0-9] [1-6]*
+rm *.log
+
+find . -type f \( -name '*:Zone.Identifier' -o -name 'Zone.Identifier' \) -delete 2>/dev/null || true

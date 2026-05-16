@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  Field          | OpenFOAM                                        |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+actions
+(
+    {
+        name    windCells;
+        type    cellSet;
+        action  new;
+
+        source  boxToCell;
+
+        sourceInfo
+        {
+            box (4.5 -1 0.40) (5.3 1 0.9);
+        }
+    }
+
+    {
+        name    windZone;
+        type    cellZoneSet;
+        action  new;
+
+        source  setToCellZone;
+
+        sourceInfo
+        {
+            set windCells;
+        }
+    }
+);

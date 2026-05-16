@@ -1,0 +1,45 @@
+#!/bin/bash
+
+echo "========================================"
+echo "Starting OlaFlow simulation"
+echo "========================================"
+
+# Clean old processor folders
+echo "Cleaning old parallel files..."
+rm -rf processor*
+rm -rf constant/polyMesh
+# Create mesh
+
+echo "Running blockMesh..."
+blockMesh > blockMesh.log
+surfaceFeatures > Surface.log
+snappyHexMesh -overwrite > snappy.log
+
+# Reset initial conditions
+echo "Preparing 0 folder..."
+rm -rf 0
+cp -r 0.org 0
+
+# Initialize water field
+echo "Running setFields..."
+setFields > setFields.log
+
+# Create cell zones
+echo "Running topoSet..."
+topoSet > topoSet.log
+
+# Decompose domain
+echo "Running decomposePar..."
+decomposePar > decomposePar.log
+
+# Run solver in parallel
+echo "Running olaFlow in parallel..."
+mpirun -np 8 olaFlow -parallel > olaFlow.log
+
+# Reconstruct results
+echo "Reconstructing case..."
+reconstructPar > reconstructPar.log
+
+echo "========================================"
+echo "Simulation complete."
+echo "========================================"

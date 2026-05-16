@@ -1,0 +1,30 @@
+# Wavefront OBJ file written 2026-05-16T17:08:08
+o block_edgeMesh
+
+# points : 8
+# lines  : 11
+
+# <points count="8">
+v 4 0.5 0
+v 4 -0.5 0
+v 5.5 -0.5 0.3
+v 5.5 0.5 0.3
+v 5.5 0.5 0
+v 5.5 -0.5 0
+v 5.39688 0.5 0.3
+v 5.39688 -0.5 0.3
+# </points>
+
+# <edges count="11">
+l 1 2
+l 7 1
+l 2 8
+l 8 3
+l 3 4
+l 4 7
+l 5 4
+l 6 5
+l 3 6
+l 1 5
+l 6 2
+# </edges>
