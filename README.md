@@ -365,7 +365,7 @@ echo "Simulation complete."
 echo "========================================"
 ```
 
-## 9. Monitoring the run
+## 9. Monitoring the run(Optional)
 
 Use:
 
@@ -404,11 +404,12 @@ A stable run should have:
 For early testing:
 
 1. Run without wind first.
-2. Confirm the wave case is stable.
-3. Add the wind source only in a clean upper-air region.
-4. Start with a very small source value.
-5. Increase gradually.
-6. Avoid placing the source near snappyHexMesh transition cells or caisson corners.
+2. Keep adjusting the wave height.
+3. Confirm the wave case is stable.
+4. Add the wind source only in a clean upper-air region.
+5. Start with a very small source value.
+6. Increase gradually.
+7. Avoid placing the source near snappyHexMesh transition cells or caisson corners.
 
 For the most physical wind setup, split the inlet into two patches:
 
