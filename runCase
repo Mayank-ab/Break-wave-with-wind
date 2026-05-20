@@ -12,8 +12,9 @@ rm -rf constant/polyMesh
 
 echo "Running blockMesh..."
 blockMesh > blockMesh.log
-surfaceFeatures > Surface.log
-snappyHexMesh -overwrite > snappy.log
+
+"surfaceFeatures > Surface.log
+snappyHexMesh -overwrite > snappy.log"
 
 # Reset initial conditions
 echo "Preparing 0 folder..."

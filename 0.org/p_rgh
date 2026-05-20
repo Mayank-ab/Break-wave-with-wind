@@ -22,8 +22,7 @@ boundaryField
 {
     frontAndBack
     {
-        type            fixedFluxPressure;
-        value           uniform 0;
+        type            empty;
     }
     outlet 
     {

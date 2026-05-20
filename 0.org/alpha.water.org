@@ -28,7 +28,7 @@ boundaryField
     }
     frontAndBack
     {
-        type            zeroGradient;
+        type            empty;
     }
     outlet
     {

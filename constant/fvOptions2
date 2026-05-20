@@ -1,0 +1,293 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  Field          | OpenFOAM                                        |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvOptions;
+}
+
+waterOnlyRampAcceleration
+{
+    type            coded;
+    active          yes;
+
+    // OpenFOAM 10 needs this keyword./c
+    selectionMode   all;
+
+    // Field to which source is added
+    field           U;
+
+    codeInclude
+    #{
+        #include "fvCFD.H"
+    #};
+
+    codeAddSup
+    #{
+        const volScalarField& alphaWater =
+            mesh().lookupObject<volScalarField>("alpha.water");
+
+        const scalar t = mesh().time().value();
+
+        // ---------------- USER SETTINGS ----------------
+
+        const word zoneName = "windZone";
+
+        // source starts after wave is formed
+        const scalar startTime = 4.0;
+
+        // smooth ramp duration
+        const scalar rampDuration = 4.0;
+
+        // artificial water acceleration in +x direction, m/s2
+        const vector acceleration(0.05, 0.0, 0.0);
+
+        // ------------------------------------------------
+
+        scalar ramp = 0.0;
+
+        if (t <= startTime)
+        {
+            ramp = 0.0;
+        }
+        else if (t < startTime + rampDuration)
+        {
+            const scalar tau = (t - startTime)/rampDuration;
+            ramp = 0.5*(1.0 - Foam::cos(Foam::constant::mathematical::pi*tau));
+        }
+        else
+        {
+            ramp = 1.0;
+        }
+
+        const label zoneID = mesh().cellZones().findZoneID(zoneName);
+
+        if (zoneID == -1)
+        {
+            FatalErrorInFunction
+                << "Cannot find cellZone named " << zoneName << nl
+                << "Run topoSet before decomposePar." << nl
+                << exit(FatalError);
+        }
+
+        const labelList& selectedCells = mesh().cellZones()[zoneID];
+
+        vectorField& USource = eqn.source();
+        const scalarField& V = mesh().V();
+
+        scalar alphaSum = 0.0;
+        scalar sourceMagSum = 0.0;
+
+        forAll(selectedCells, i)
+        {
+            const label celli = selectedCells[i];
+
+            scalar waterFraction = alphaWater[celli];
+
+            if (waterFraction < 0.0)
+            {
+                waterFraction = 0.0;
+            }
+            else if (waterFraction > 1.0)
+            {
+                waterFraction = 1.0;
+            }
+
+            vector source =
+                waterFraction
+               *V[celli]
+               *ramp
+               *acceleration;
+
+            // If water moves opposite direction, change -= to +=
+            USource[celli] -= source;
+
+            alphaSum += waterFraction;
+            sourceMagSum += mag(source);
+        }
+
+        Info<< "waterOnlyRampAcceleration:"
+            << " time = " << t
+            << ", ramp = " << ramp
+            << ", selectedCells = " << selectedCells.size()
+            << ", alphaSum = " << alphaSum
+            << ", sourceMagSum = " << sourceMagSum
+            << ", acceleration = " << acceleration
+            << endl;
+    #};
+
+    codeAddRhoSup
+    #{
+        const volScalarField& alphaWater =
+            mesh().lookupObject<volScalarField>("alpha.water");
+
+        const scalar t = mesh().time().value();
+
+        const word zoneName = "windZone";
+        const scalar startTime = 4.0;
+        const scalar rampDuration = 4.0;
+        const vector acceleration(0.05, 0.0, 0.0);
+
+        scalar ramp = 0.0;
+
+        if (t <= startTime)
+        {
+            ramp = 0.0;
+        }
+        else if (t < startTime + rampDuration)
+        {
+            const scalar tau = (t - startTime)/rampDuration;
+            ramp = 0.5*(1.0 - Foam::cos(Foam::constant::mathematical::pi*tau));
+        }
+        else
+        {
+            ramp = 1.0;
+        }
+
+        const label zoneID = mesh().cellZones().findZoneID(zoneName);
+
+        if (zoneID == -1)
+        {
+            FatalErrorInFunction
+                << "Cannot find cellZone named " << zoneName << nl
+                << "Run topoSet before decomposePar." << nl
+                << exit(FatalError);
+        }
+
+        const labelList& selectedCells = mesh().cellZones()[zoneID];
+
+        vectorField& USource = eqn.source();
+        const scalarField& V = mesh().V();
+
+        scalar alphaSum = 0.0;
+        scalar sourceMagSum = 0.0;
+
+        forAll(selectedCells, i)
+        {
+            const label celli = selectedCells[i];
+
+            scalar waterFraction = alphaWater[celli];
+
+            if (waterFraction < 0.0)
+            {
+                waterFraction = 0.0;
+            }
+            else if (waterFraction > 1.0)
+            {
+                waterFraction = 1.0;
+            }
+
+            vector source =
+                waterFraction
+               *rho[celli]
+               *V[celli]
+               *ramp
+               *acceleration;
+
+            // If water moves opposite direction, change -= to +=
+            USource[celli] -= source;
+
+            alphaSum += waterFraction;
+            sourceMagSum += mag(source);
+        }
+
+        Info<< "waterOnlyRampAcceleration rho:"
+            << " time = " << t
+            << ", ramp = " << ramp
+            << ", selectedCells = " << selectedCells.size()
+            << ", alphaSum = " << alphaSum
+            << ", sourceMagSum = " << sourceMagSum
+            << ", acceleration = " << acceleration
+            << endl;
+    #};
+
+    codeAddAlphaRhoSup
+    #{
+        const volScalarField& alphaWater =
+            mesh().lookupObject<volScalarField>("alpha.water");
+
+        const scalar t = mesh().time().value();
+
+        const word zoneName = "windZone";
+        const scalar startTime = 4.0;
+        const scalar rampDuration = 4.0;
+        const vector acceleration(0.05, 0.0, 0.0);
+
+        scalar ramp = 0.0;
+
+        if (t <= startTime)
+        {
+            ramp = 0.0;
+        }
+        else if (t < startTime + rampDuration)
+        {
+            const scalar tau = (t - startTime)/rampDuration;
+            ramp = 0.5*(1.0 - Foam::cos(Foam::constant::mathematical::pi*tau));
+        }
+        else
+        {
+            ramp = 1.0;
+        }
+
+        const label zoneID = mesh().cellZones().findZoneID(zoneName);
+
+        if (zoneID == -1)
+        {
+            FatalErrorInFunction
+                << "Cannot find cellZone named " << zoneName << nl
+                << "Run topoSet before decomposePar." << nl
+                << exit(FatalError);
+        }
+
+        const labelList& selectedCells = mesh().cellZones()[zoneID];
+
+        vectorField& USource = eqn.source();
+        const scalarField& V = mesh().V();
+
+        scalar alphaSum = 0.0;
+        scalar sourceMagSum = 0.0;
+
+        forAll(selectedCells, i)
+        {
+            const label celli = selectedCells[i];
+
+            scalar waterFraction = alphaWater[celli];
+
+            if (waterFraction < 0.0)
+            {
+                waterFraction = 0.0;
+            }
+            else if (waterFraction > 1.0)
+            {
+                waterFraction = 1.0;
+            }
+
+            vector source =
+                waterFraction
+               *rho[celli]
+               *V[celli]
+               *ramp
+               *acceleration;
+
+            // If water moves opposite direction, change -= to +=
+            USource[celli] -= source;
+
+            alphaSum += waterFraction;
+            sourceMagSum += mag(source);
+        }
+
+        Info<< "waterOnlyRampAcceleration alphaRho:"
+            << " time = " << t
+            << ", ramp = " << ramp
+            << ", selectedCells = " << selectedCells.size()
+            << ", alphaSum = " << alphaSum
+            << ", sourceMagSum = " << sourceMagSum
+            << ", acceleration = " << acceleration
+            << endl;
+    #};
+}

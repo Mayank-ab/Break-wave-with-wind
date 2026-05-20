@@ -44,8 +44,7 @@ boundaryField
     }
     frontAndBack
     {
-        type            pressureInletOutletVelocity;
-        value           uniform (0 0 0);
+        type            empty;
     }
     block
     {

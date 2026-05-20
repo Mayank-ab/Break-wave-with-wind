@@ -10,6 +10,7 @@ then
     exit
 fi
 rm -rf processor*
+rm -rf dynamicCode
 
 if [ -d "./constant/polyMesh" ]; then
   cd ./constant
